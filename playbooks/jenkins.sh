@@ -2,7 +2,7 @@
 
 #another method of installing jenkins
 
-sudo apt update -y
+# sudo apt update -y
 
 sudo apt upgrade -y 
 
