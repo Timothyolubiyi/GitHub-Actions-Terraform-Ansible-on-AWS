@@ -50,6 +50,9 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
 
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
+
       - name: Generate Ansible Inventory
         run: |
           CONTROLLER_IP=$(terraform output -raw ansible_controller_public_ip)
