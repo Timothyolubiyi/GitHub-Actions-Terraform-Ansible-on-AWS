@@ -1,34 +1,31 @@
-#!/bin/bash
+---
+- name: Install Jenkins on Remote Server
+  hosts: jenkins
+  become: yes
 
-# Exit immediately if a command exits with a non-zero status.
-set -e
+  tasks:
+    - name: Install Java (Jenkins dependency)
+      yum:
+        name: java-11-openjdk
+        state: present
 
-echo "📦 Updating system packages..."
-sudo apt update -y
-sudo apt upgrade -y
+    - name: Add Jenkins repo
+      get_url:
+        url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+        dest: /etc/yum.repos.d/jenkins.repo
 
-echo "☕ Installing Java (Jenkins dependency)..."
-sudo apt install -y openjdk-17-jdk
+    - name: Import Jenkins key
+      rpm_key:
+        state: present
+        key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
 
-echo "🔑 Adding Jenkins repository key..."
-wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo tee \
-  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+    - name: Install Jenkins
+      yum:
+        name: jenkins
+        state: present
 
-echo "📦 Adding Jenkins package repository..."
-echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
-  https://pkg.jenkins.io/debian binary/ | sudo tee \
-  /etc/apt/sources.list.d/jenkins.list > /dev/null
-
-echo "🔄 Updating apt cache..."
-sudo apt update -y
-
-echo "🚀 Installing Jenkins..."
-sudo apt install -y jenkins
-
-echo "🟢 Starting and enabling Jenkins service..."
-sudo systemctl enable jenkins
-sudo systemctl start jenkins
-
-echo "✅ Jenkins installation complete."
-echo "🔐 Fetching initial admin password..."
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+    - name: Start and enable Jenkins
+      systemd:
+        name: jenkins
+        enabled: yes
+        state: started
