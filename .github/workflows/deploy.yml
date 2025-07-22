@@ -68,4 +68,4 @@ jobs:
 
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook -i inventory.ini playbooks/jenkins.sh
+          ansible-playbook -i inventory.ini playbooks/jenkins.yml
